@@ -33,7 +33,12 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link })
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+      }
+      res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+    });
 };
 
 module.exports.likeCard = (req, res) => {

@@ -16,7 +16,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+
+  if (!User.Types.ObjectId.isValid(userId)) {
+    res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+  }
+
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
@@ -35,14 +41,19 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+      }
+      res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+    });
 };
 
 module.exports.updateUserInfo = (req, res) => {
   const id = req.user._id;
   const { name, about } = req.body;
 
-  if (!id || name || about) {
+  if (!name || !about) {
     res.status(BAD_REQUEST_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
   }
 
@@ -68,7 +79,7 @@ module.exports.updateUserAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
 
-  if (!id || avatar) {
+  if (!avatar) {
     res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
   }
 
