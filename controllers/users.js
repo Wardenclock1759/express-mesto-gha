@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/user');
 
 const {
@@ -18,7 +19,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   const { userId } = req.params;
 
-  if (!User.schema.ObjectId.isValid(userId)) {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
     res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
   }
 
