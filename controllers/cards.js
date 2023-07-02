@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const {
@@ -42,10 +43,10 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.likeCard = (req, res) => {
-  const { cardId } = req.params.cardId;
-  const { userId } = req.user._id;
+  const { cardId } = req.params;
+  const userId = req.user._id;
 
-  if (!cardId || !userId) {
+  if (!mongoose.Types.ObjectId.isValid(cardId)) {
     res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
   }
 
@@ -55,21 +56,21 @@ module.exports.likeCard = (req, res) => {
     { new: true },
     (err, card) => {
       if (err) {
-        return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+        res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
       }
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      return res.send({ data: card });
+      res.send({ data: card });
     },
   );
 };
 
 module.exports.dislikeCard = (req, res) => {
-  const { cardId } = req.params.cardId;
-  const { userId } = req.user._id;
+  const { cardId } = req.params;
+  const userId = req.user._id;
 
-  if (!cardId || !userId) {
+  if (!mongoose.Types.ObjectId.isValid(cardId)) {
     res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
   }
 
@@ -79,12 +80,12 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
     (err, card) => {
       if (err) {
-        return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+        res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
       }
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      return res.send({ data: card });
+      res.send({ data: card });
     },
   );
 };
