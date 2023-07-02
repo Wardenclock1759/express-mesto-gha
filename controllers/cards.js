@@ -21,15 +21,15 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
+    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
   }
 
-  Card.findByIdAndRemove(cardId)
+  return Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: card });
+      return res.send({ data: card });
     })
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
@@ -37,17 +37,17 @@ module.exports.deleteCard = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
-  if (!name || !link) {
-    res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-  }
+  // if (!name || !link) {
+  //   res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+  // }
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
       }
-      res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
     });
 };
 
@@ -56,19 +56,19 @@ module.exports.likeCard = (req, res) => {
   const userId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
+    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
   }
 
-  Card.findByIdAndUpdate(
+  return Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: userId } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: card });
+      return res.send({ data: card });
     })
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
@@ -78,19 +78,19 @@ module.exports.dislikeCard = (req, res) => {
   const userId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
+    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
   }
 
-  Card.findByIdAndUpdate(
+  return Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: userId } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: card });
+      return res.send({ data: card });
     })
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };

@@ -20,15 +20,15 @@ module.exports.getUser = (req, res) => {
   const { userId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+    return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
   }
 
-  User.findById(userId)
+  return User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: user });
+      return res.send({ data: user });
     })
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
@@ -36,17 +36,17 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  if (!name || !about || !avatar) {
-    res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-  }
+  // if (!name || !about || !avatar) {
+  //   res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+  // }
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
       }
-      res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
     });
 };
 
@@ -54,9 +54,9 @@ module.exports.updateUserInfo = (req, res) => {
   const id = req.user._id;
   const { name, about } = req.body;
 
-  if (!name || !about) {
-    res.status(BAD_REQUEST_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
-  }
+  // if (!name || !about) {
+  //   res.status(BAD_REQUEST_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
+  // }
 
   User.findByIdAndUpdate(
     id,
@@ -69,20 +69,25 @@ module.exports.updateUserInfo = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: user });
+      return res.send({ data: user });
     })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+      }
+      return res.status(INTERNAL_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
+    });
 };
 
 module.exports.updateUserAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
 
-  if (!avatar) {
-    res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
-  }
+  // if (!avatar) {
+  //   res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
+  // }
 
   User.findByIdAndUpdate(
     id,
@@ -95,9 +100,14 @@ module.exports.updateUserAvatar = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
-      res.send({ data: user });
+      return res.send({ data: user });
     })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
+      }
+      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+    });
 };
