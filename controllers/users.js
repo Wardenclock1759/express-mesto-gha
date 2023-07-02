@@ -18,7 +18,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   const { userId } = req.params;
 
-  if (!User.Types.ObjectId.isValid(userId)) {
+  if (!User.schema.ObjectId.isValid(userId)) {
     res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
   }
 
