@@ -54,16 +54,14 @@ module.exports.likeCard = (req, res) => {
     cardId,
     { $addToSet: { likes: userId } },
     { new: true },
-    (err, card) => {
-      if (err) {
-        res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
-      }
+  )
+    .then((card) => {
       if (!card) {
         res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
       res.send({ data: card });
-    },
-  );
+    })
+    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -78,14 +76,12 @@ module.exports.dislikeCard = (req, res) => {
     cardId,
     { $pull: { likes: userId } },
     { new: true },
-    (err, card) => {
-      if (err) {
-        res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
-      }
+  )
+    .then((card) => {
       if (!card) {
         res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
       }
       res.send({ data: card });
-    },
-  );
+    })
+    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
