@@ -40,7 +40,7 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(STATUS_CREATED).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
       }
       return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });

@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const routes = require('./routes/index');
 const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
 
 const app = express();
@@ -20,8 +21,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/', routes);
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });

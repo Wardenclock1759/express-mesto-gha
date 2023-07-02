@@ -39,7 +39,7 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(STATUS_CREATED).send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
       }
       return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
@@ -65,7 +65,7 @@ module.exports.updateUserInfo = (req, res) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
       }
       return res.status(INTERNAL_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
@@ -91,7 +91,7 @@ module.exports.updateUserAvatar = (req, res) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
       }
       return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
