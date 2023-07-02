@@ -46,32 +46,6 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateUserInfo = (req, res) => {
-  const id = req.user._id;
-  const { name, about } = req.body;
-
-  User.findByIdAndUpdate(
-    id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
-      }
-      return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-      }
-      return res.status(INTERNAL_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
-    });
-};
-
 module.exports.updateUserAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
@@ -97,3 +71,32 @@ module.exports.updateUserAvatar = (req, res) => {
       return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
     });
 };
+
+function updateUser(func) {
+  return (req, res) => {
+    User.findById(req.user._id)
+      .then((user) => {
+        if (!user) {
+          return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        }
+        func(user, req.body);
+        return user.save();
+      })
+      .then((user) => res.send({ data: user }))
+      .catch((err) => {
+        if (err instanceof mongoose.Error.ValidationError) {
+          return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+        }
+        return res.status(INTERNAL_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
+      });
+  };
+}
+
+module.exports.updateUserInfo = updateUser((user, body) => {
+  user.name = body.name;
+  user.about = body.about;
+});
+
+module.exports.updateUserInfo = updateUser((user, body) => {
+  user.avatar = body.avatar;
+});
