@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
-const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('constants');
+const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
 
 const app = express();
 app.use(bodyParser.json());
