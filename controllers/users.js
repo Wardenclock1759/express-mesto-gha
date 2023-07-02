@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 
 const {
-  BAD_REQUEST_CODE, NOT_FOUND_CODE, INTERNAL_CODE, INTERNAL_MESSAGE,
+  STATUS_CREATED, BAD_REQUEST_CODE, NOT_FOUND_CODE, INTERNAL_CODE, INTERNAL_MESSAGE,
 } = require('../constants');
 
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
@@ -36,12 +36,8 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  // if (!name || !about || !avatar) {
-  //   res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-  // }
-
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(STATUS_CREATED).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
@@ -54,17 +50,12 @@ module.exports.updateUserInfo = (req, res) => {
   const id = req.user._id;
   const { name, about } = req.body;
 
-  // if (!name || !about) {
-  //   res.status(BAD_REQUEST_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
-  // }
-
   User.findByIdAndUpdate(
     id,
     { name, about },
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
@@ -85,17 +76,12 @@ module.exports.updateUserAvatar = (req, res) => {
   const id = req.user._id;
   const { avatar } = req.body;
 
-  // if (!avatar) {
-  //   res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
-  // }
-
   User.findByIdAndUpdate(
     id,
     { avatar },
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {

@@ -1,3 +1,4 @@
+module.exports.STATUS_CREATED = 201;
 module.exports.BAD_REQUEST_CODE = 400;
 module.exports.NOT_FOUND_CODE = 404;
 module.exports.INTERNAL_CODE = 500;
