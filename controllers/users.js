@@ -46,32 +46,6 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.updateUserAvatar = (req, res) => {
-  const id = req.user._id;
-  const { avatar } = req.body;
-
-  User.findByIdAndUpdate(
-    id,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
-      }
-      return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST_CODE).send({ message: AVATAR_UPDATE_MESSAGE });
-      }
-      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
-    });
-};
-
 function updateUser(func) {
   return (req, res) => {
     User.findById(req.user._id)
@@ -97,6 +71,6 @@ module.exports.updateUserInfo = updateUser((user, body) => {
   user.about = body.about;
 });
 
-module.exports.updateUserInfo = updateUser((user, body) => {
+module.exports.updateUserAvatar = updateUser((user, body) => {
   user.avatar = body.avatar;
 });
