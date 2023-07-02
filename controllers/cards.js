@@ -31,7 +31,7 @@ module.exports.createCard = (req, res) => {
     res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
   }
 
-  Card.create({ name, link })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
