@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('constants');
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,5 +22,9 @@ app.use((req, res, next) => {
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+app.use('*', (req, res) => {
+  res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+});
 
 app.listen(3000);

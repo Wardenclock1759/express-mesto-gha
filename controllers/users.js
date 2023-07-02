@@ -3,7 +3,7 @@ const User = require('../models/user');
 
 const {
   BAD_REQUEST_CODE, NOT_FOUND_CODE, INTERNAL_CODE, INTERNAL_MESSAGE,
-} = require('./constants');
+} = require('../constants');
 
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
