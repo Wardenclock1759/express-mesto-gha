@@ -46,31 +46,30 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-function updateUser(func) {
+function updateUser(toUpdate, errorMessage) {
   return (req, res) => {
-    User.findById(req.user._id)
+    const userId = req.user._id;
+    const updated = toUpdate(req.body);
+
+    User.findByIdAndUpdate(userId, updated, { new: true, runValidators: true })
       .then((user) => {
         if (!user) {
           return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
         }
-        func(user, req.body);
-        return user.save();
+        return res.send({ data: user });
       })
-      .then((user) => res.send({ data: user }))
       .catch((err) => {
         if (err instanceof mongoose.Error.ValidationError) {
           return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
         }
-        return res.status(INTERNAL_CODE).send({ message: PROFILE_UPDATE_MESSAGE });
+        return res.status(INTERNAL_CODE).send({ message: errorMessage });
       });
   };
 }
 
-module.exports.updateUserInfo = updateUser((user, body) => {
-  user.name = body.name;
-  user.about = body.about;
-});
+module.exports.updateUserInfo = updateUser(
+  ({ name, about }) => ({ name, about }),
+  PROFILE_UPDATE_MESSAGE,
+);
 
-module.exports.updateUserAvatar = updateUser((user, body) => {
-  user.avatar = body.avatar;
-});
+module.exports.updateUserAvatar = updateUser(({ avatar }) => ({ avatar }), AVATAR_UPDATE_MESSAGE);
