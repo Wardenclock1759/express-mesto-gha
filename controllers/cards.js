@@ -47,7 +47,7 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.likeCard = (req, res) => {
+const updateCard = (updateFunction) => (req, res) => {
   const { cardId } = req.params;
   const userId = req.user._id;
 
@@ -57,7 +57,7 @@ module.exports.likeCard = (req, res) => {
 
   return Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: userId } },
+    updateFunction(userId),
     { new: true },
   )
     .then((card) => {
@@ -69,24 +69,10 @@ module.exports.likeCard = (req, res) => {
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
 
-module.exports.dislikeCard = (req, res) => {
-  const { cardId } = req.params;
-  const userId = req.user._id;
+module.exports.likeCard = updateCard(
+  (userId) => ({ $addToSet: { likes: userId } }),
+);
 
-  if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
-  }
-
-  return Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: userId } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
-      }
-      return res.send({ data: card });
-    })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
-};
+module.exports.dislikeCard = updateCard(
+  (userId) => ({ $pull: { likes: userId } }),
+);
