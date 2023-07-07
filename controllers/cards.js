@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 const {
-  STATUS_CREATED, BAD_REQUEST_CODE, NOT_FOUND_CODE, INTERNAL_CODE, INTERNAL_MESSAGE,
+  STATUS_CREATED,
+  BAD_REQUEST_CODE,
+  FORBITTEN_CODE,
+  NOT_FOUND_CODE,
+  INTERNAL_CODE,
+  FORBITTEN_MESSAGE,
+  INTERNAL_MESSAGE,
 } = require('../constants');
 
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании карточки.';
@@ -19,6 +25,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
+  const currentUserId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(cardId)) {
     return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
@@ -28,6 +35,9 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+      }
+      if (card.owner._id !== currentUserId) {
+        return res.status(FORBITTEN_CODE).send({ message: FORBITTEN_MESSAGE });
       }
       return res.send({ data: card });
     })
