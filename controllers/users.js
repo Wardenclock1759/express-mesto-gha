@@ -3,12 +3,12 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-error');
 
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
   UNAUTHORIZED_CODE,
-  NOT_FOUND_CODE,
   INTERNAL_CODE,
   INTERNAL_MESSAGE,
   UNAUTHORIZED_MESSAGE,
@@ -17,8 +17,8 @@ const {
 
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
-const PROFILE_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении профиля';
-const AVATAR_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении аватара';
+// const PROFILE_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении профиля';
+// const AVATAR_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении аватара';
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
@@ -43,7 +43,7 @@ module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        throw new NotFoundError(NOT_FOUND_MESSAGE);
       } else {
         res.send({ data: user });
       }
@@ -57,7 +57,7 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -67,11 +67,11 @@ module.exports.getUser = (req, res) => {
   return User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
       return res.send({ data: user });
     })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch(next);
 };
 
 module.exports.createUser = (req, res) => {
@@ -98,30 +98,24 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-function updateUser(toUpdate, errorMessage) {
-  return (req, res) => {
+function updateUser(toUpdate) {
+  return (req, res, next) => {
     const userId = req.user._id;
     const updated = toUpdate(req.body);
 
     User.findByIdAndUpdate(userId, updated, { new: true, runValidators: true })
       .then((user) => {
         if (!user) {
-          return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+          throw new NotFoundError(NOT_FOUND_MESSAGE);
         }
         return res.send({ data: user });
       })
-      .catch((err) => {
-        if (err instanceof mongoose.Error.ValidationError) {
-          return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-        }
-        return res.status(INTERNAL_CODE).send({ message: errorMessage });
-      });
+      .catch(next);
   };
 }
 
 module.exports.updateUserInfo = updateUser(
   ({ name, about }) => ({ name, about }),
-  PROFILE_UPDATE_MESSAGE,
 );
 
-module.exports.updateUserAvatar = updateUser(({ avatar }) => ({ avatar }), AVATAR_UPDATE_MESSAGE);
+module.exports.updateUserAvatar = updateUser(({ avatar }) => ({ avatar }));

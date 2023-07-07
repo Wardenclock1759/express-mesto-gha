@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 
 const routes = require('./routes/index');
 const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
@@ -17,6 +18,20 @@ app.use('/', routes);
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+});
+
+app.use(errors());
+
+app.use((err, req, res) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
 });
 
 app.listen(3000);

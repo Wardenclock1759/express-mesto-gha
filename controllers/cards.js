@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-error');
 
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
   FORBITTEN_CODE,
-  NOT_FOUND_CODE,
   INTERNAL_CODE,
   FORBITTEN_MESSAGE,
   INTERNAL_MESSAGE,
@@ -23,7 +23,7 @@ module.exports.getCards = (req, res) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const currentUserId = req.user._id;
 
@@ -34,14 +34,14 @@ module.exports.deleteCard = (req, res) => {
   return Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
       if (card.owner._id !== currentUserId) {
         return res.status(FORBITTEN_CODE).send({ message: FORBITTEN_MESSAGE });
       }
       return res.send({ data: card });
     })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res) => {
@@ -57,7 +57,7 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-const updateCard = (updateFunction) => (req, res) => {
+const updateCard = (updateFunction) => (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
 
@@ -72,11 +72,11 @@ const updateCard = (updateFunction) => (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+        throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
       return res.send({ data: card });
     })
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch(next);
 };
 
 module.exports.likeCard = updateCard(
