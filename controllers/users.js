@@ -85,9 +85,11 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then((user) => res.status(STATUS_CREATED).send({
-      data: user,
-    }))
+    .then((user) => {
+      const userObject = user.toObject();
+      delete userObject.password;
+      res.status(STATUS_CREATED).send({ data: userObject });
+    })
     .catch(next);
 };
 
