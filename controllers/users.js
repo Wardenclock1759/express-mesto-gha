@@ -9,9 +9,11 @@ const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
   UNAUTHORIZED_CODE,
+  CONFLICT_CODE,
   INTERNAL_CODE,
   INTERNAL_MESSAGE,
   UNAUTHORIZED_MESSAGE,
+  CONFLICT_MESSAGE,
   AUTHENTICATED,
 } = require('../constants');
 
@@ -21,7 +23,7 @@ const NOT_FOUND_MESSAGE = 'Пользователь по указанному _i
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password).select('+password')
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const secret = process.env.JWT_SECRET || 'super-strong-secret';
       const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
@@ -32,8 +34,8 @@ module.exports.login = (req, res) => {
       });
       res.send({ message: AUTHENTICATED });
     })
-    .catch(() => {
-      res.status(UNAUTHORIZED_CODE).send({ message: UNAUTHORIZED_MESSAGE });
+    .catch((err) => {
+      res.status(UNAUTHORIZED_CODE).send({ message: err.message });
     });
 };
 
@@ -90,7 +92,13 @@ module.exports.createUser = (req, res, next) => {
       delete userObject.password;
       res.status(STATUS_CREATED).send({ data: userObject });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next({ statusCode: CONFLICT_CODE, message: CONFLICT_MESSAGE });
+      } else {
+        next(err);
+      }
+    });
 };
 
 function updateUser(toUpdate) {
