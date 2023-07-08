@@ -4,6 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
 
 const {
   STATUS_CREATED,
@@ -93,7 +94,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next({ statusCode: CONFLICT_CODE, message: CONFLICT_MESSAGE });
+        next(new ConflictError(CONFLICT_MESSAGE));
       } else {
         next(err);
       }
