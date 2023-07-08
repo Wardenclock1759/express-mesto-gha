@@ -4,6 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
 
 const {
   STATUS_CREATED,
@@ -11,6 +12,7 @@ const {
   UNAUTHORIZED_CODE,
   INTERNAL_CODE,
   INTERNAL_MESSAGE,
+  CONFLICT_MESSAGE,
   AUTHENTICATED,
 } = require('../constants');
 
@@ -89,7 +91,13 @@ module.exports.createUser = (req, res, next) => {
       delete userObject.password;
       res.status(STATUS_CREATED).send({ data: userObject });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError(CONFLICT_MESSAGE));
+      } else {
+        next(err);
+      }
+    });
 };
 
 function updateUser(toUpdate) {
