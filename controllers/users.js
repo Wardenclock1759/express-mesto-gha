@@ -12,7 +12,6 @@ const {
   UNAUTHORIZED_CODE,
   INTERNAL_CODE,
   INTERNAL_MESSAGE,
-  CONFLICT_MESSAGE,
   AUTHENTICATED,
 } = require('../constants');
 
@@ -93,7 +92,7 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError(CONFLICT_MESSAGE));
+        next(new ConflictError('Пользователь уже существует'));
       } else {
         next(err);
       }
