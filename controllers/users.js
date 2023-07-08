@@ -17,8 +17,6 @@ const {
 
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
-// const PROFILE_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении профиля';
-// const AVATAR_UPDATE_MESSAGE = 'Переданы некорректные данные при обновлении аватара';
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const isURL = require('validator/lib/isURL');
 const auth = require('../middlewares/auth');
 const {
   login, createUser,
@@ -20,7 +21,12 @@ router.post('/signup', celebrate({
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().custom((value, helper) => {
+      if (!isURL(value)) {
+        return helper.message('Неправильная ссылка на картинку');
+      }
+      return value;
+    }),
   }),
 }), createUser);
 
