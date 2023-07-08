@@ -74,7 +74,7 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUser = (req, res, next) => {
+module.exports.createUser = (req, res) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
@@ -90,7 +90,12 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.status(STATUS_CREATED).send({
       data: user,
     }))
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
+      }
+      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
+    });
 };
 
 function updateUser(toUpdate) {
