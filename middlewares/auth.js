@@ -1,29 +1,23 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
-const handleAuthError = (res) => {
-  res
-    .status(401)
-    .send({ message: 'Необходима авторизация' });
-};
+const NotAuthenticated = require('../errors/not-authenticated');
 
 module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
-
-  if (!token) {
-    return handleAuthError(res);
-  }
-
-  const secret = process.env.JWT_SECRET || 'super-strong-secret';
-  let payload;
-
   try {
-    payload = jwt.verify(token, secret);
-  } catch (err) {
-    return handleAuthError(res);
+    const token = req.cookies.jwt;
+
+    if (!token) {
+      const err = new NotAuthenticated('Необходима авторизация');
+      return next(err);
+    }
+
+    const secret = process.env.JWT_SECRET || 'super-strong-secret';
+
+    const payload = jwt.verify(token, secret);
+    req.user = payload;
+  } catch (e) {
+    const err = new NotAuthenticated('Необходима авторизация');
+    next(err);
   }
-
-  req.user = payload;
-
   return next();
 };
