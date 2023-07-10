@@ -8,7 +8,6 @@ const NotFoundError = require('../errors/not-found-error');
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
-  UNAUTHORIZED_CODE,
   INTERNAL_CODE,
   INTERNAL_MESSAGE,
   AUTHENTICATED,
@@ -17,7 +16,7 @@ const {
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -31,9 +30,7 @@ module.exports.login = (req, res) => {
       });
       res.send({ message: AUTHENTICATED });
     })
-    .catch((err) => {
-      res.status(UNAUTHORIZED_CODE).send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {

@@ -36,7 +36,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== currentUserId) {
         throw new ForbiddenError(FORBITTEN_MESSAGE);
       }
-      return Card.findByIdAndRemove(cardId);
+      return Card.deleteOne(cardId);
     })
     .then((card) => res.send({ card }))
     .catch(next);
