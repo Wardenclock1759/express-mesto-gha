@@ -46,7 +46,6 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .populate('owner')
     .then((card) => res.status(STATUS_CREATED).send({ card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
