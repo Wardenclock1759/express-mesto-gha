@@ -17,14 +17,11 @@ const {
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
 
-module.exports.login = (req, res, next) => {
+module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new NotAuthenticated('Неправильный email или пароль');
-      }
       const secret = process.env.JWT_SECRET || 'super-strong-secret';
       const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
       res.cookie('jwt', token, {
@@ -34,7 +31,10 @@ module.exports.login = (req, res, next) => {
       });
       res.send({ message: AUTHENTICATED });
     })
-    .catch(next);
+    .catch(() => {
+      const error = new NotAuthenticated('Неправильный email или пароль');
+      res.status(error.statusCode).send({ message: error.message });
+    });
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
