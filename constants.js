@@ -11,5 +11,3 @@ module.exports.FORBITTEN_MESSAGE = 'У вас нет прав для модиф�
 module.exports.NOT_FOUND_MESSAGE = 'Я потерялся';
 module.exports.CONFLICT_MESSAGE = 'Пользователь уже существует';
 module.exports.INTERNAL_MESSAGE = 'Ошибка сервера';
-
-module.exports.urlRegex = /^https?:\/\/(www\.)?[\w\-~]+\.[a-z.]{2,}([\w\-~:@!$&'()*+,;=]*\/)*([\w\-~:@!$&'()*+,;=]*#)?$/i;
