@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-error');
+const ForbiddenError = require('../errors/forbidden');
 
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
-  FORBITTEN_CODE,
   INTERNAL_CODE,
   FORBITTEN_MESSAGE,
   INTERNAL_MESSAGE,
@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
       if (card.owner._id !== currentUserId) {
-        return res.status(FORBITTEN_CODE).send({ message: FORBITTEN_MESSAGE });
+        throw new ForbiddenError(FORBITTEN_MESSAGE);
       }
       return res.send({ data: card });
     })
