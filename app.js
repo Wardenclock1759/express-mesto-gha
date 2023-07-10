@@ -8,7 +8,7 @@ const routes = require('./routes/index');
 const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
