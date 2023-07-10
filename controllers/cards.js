@@ -29,12 +29,11 @@ module.exports.deleteCard = (req, res, next) => {
   const currentUserId = req.user._id;
 
   return Card.findByIdAndRemove(cardId)
-    .populate('owner')
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
-      if (card.owner._id !== currentUserId) {
+      if (card.owner !== currentUserId) {
         throw new ForbiddenError(FORBITTEN_MESSAGE);
       }
       return res.send({ card });
@@ -68,7 +67,6 @@ const updateCard = (updateFunction) => (req, res, next) => {
     updateFunction(userId),
     { new: true },
   )
-    .populate('owner')
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
