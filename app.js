@@ -4,7 +4,8 @@ const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 
 const routes = require('./routes/index');
-const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
+const NotFoundError = require('./constants');
+const { NOT_FOUND_MESSAGE } = require('./constants');
 
 const app = express();
 app.use(express.json());
@@ -17,8 +18,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 app.use('/', routes);
 
-app.use('*', (req, res) => {
-  res.status(NOT_FOUND_CODE).send({ message: NOT_FOUND_MESSAGE });
+app.use('*', (req, res, next) => {
+  const error = new NotFoundError(NOT_FOUND_MESSAGE);
+  next(error);
 });
 
 app.use(errors());

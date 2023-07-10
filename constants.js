@@ -8,7 +8,7 @@ module.exports.INTERNAL_CODE = 500;
 module.exports.AUTHENTICATED = 'Авторизация прошла успешно';
 module.exports.UNAUTHORIZED_MESSAGE = 'Ошибка авторизации';
 module.exports.FORBITTEN_MESSAGE = 'У вас нет прав для модификации этой карточки';
-module.exports.NOT_FOUND_MESSAGE = 'Я потерялся';
+module.exports.NOT_FOUND_MESSAGE = 'По вашему запросу ничего не найдено';
 module.exports.CONFLICT_MESSAGE = 'Пользователь уже существует';
 module.exports.INTERNAL_MESSAGE = 'Ошибка сервера';
 
