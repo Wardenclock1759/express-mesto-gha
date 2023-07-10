@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-error');
-const ForbiddenError = require('../errors/forbidden');
 
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
   INTERNAL_CODE,
-  FORBITTEN_MESSAGE,
   INTERNAL_MESSAGE,
 } = require('../constants');
 
@@ -26,15 +24,11 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  const currentUserId = req.user._id;
 
   return Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
-      }
-      if (card.owner !== currentUserId) {
-        throw new ForbiddenError(FORBITTEN_MESSAGE);
       }
       return res.send({ card });
     })
