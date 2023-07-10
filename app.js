@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 
 const routes = require('./routes/index');
 const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
@@ -9,6 +10,7 @@ const { NOT_FOUND_CODE, NOT_FOUND_MESSAGE } = require('./constants');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
