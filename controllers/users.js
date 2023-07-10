@@ -4,6 +4,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
+const NotAuthenticated = require('../errors/not-authenticated');
 
 const {
   STATUS_CREATED,
@@ -21,6 +22,9 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      if (!user) {
+        throw new NotAuthenticated('Неправильный email или пароль');
+      }
       const secret = process.env.JWT_SECRET || 'super-strong-secret';
       const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
       res.cookie('jwt', token, {
