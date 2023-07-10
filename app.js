@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 
+const { PORT, MONGO_URL } = require('./config');
 const routes = require('./routes/index');
 const NotFoundError = require('./errors/not-found-error');
 const { NOT_FOUND_MESSAGE } = require('./constants');
@@ -12,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
 });
 
@@ -43,4 +44,4 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(3000);
+app.listen(PORT);

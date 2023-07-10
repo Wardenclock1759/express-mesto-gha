@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const NotAuthenticated = require('../errors/not-authenticated');
@@ -22,7 +22,7 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const secret = process.env.JWT_SECRET || 'super-strong-secret';
+      const secret = JWT_SECRET;
       const token = jwt.sign({ _id: user._id }, secret, { expiresIn: '7d' });
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
