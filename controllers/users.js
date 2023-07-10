@@ -42,7 +42,7 @@ module.exports.getCurrentUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
       } else {
-        res.send({ data: user });
+        res.send({ user });
       }
     })
     .catch(next);
@@ -50,7 +50,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send({ users }))
     .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
 };
 
@@ -66,7 +66,7 @@ module.exports.getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
-      return res.send({ data: user });
+      return res.send({ user });
     })
     .catch(next);
 };
@@ -87,7 +87,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const userObject = user.toObject();
       delete userObject.password;
-      res.status(STATUS_CREATED).send({ data: userObject });
+      res.status(STATUS_CREATED).send({ userObject });
     })
     .catch(next);
 };
@@ -102,7 +102,7 @@ function updateUser(toUpdate) {
         if (!user) {
           throw new NotFoundError(NOT_FOUND_MESSAGE);
         }
-        return res.send({ data: user });
+        return res.send({ user });
       })
       .catch(next);
   };

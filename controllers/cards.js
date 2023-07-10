@@ -17,7 +17,8 @@ const LIKE_ERROR_MESSAGE = 'Переданы некорректные данны
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .populate('owner')
+    .then((cards) => res.send({ cards }))
     .catch(() => {
       res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
     });
@@ -28,6 +29,7 @@ module.exports.deleteCard = (req, res, next) => {
   const currentUserId = req.user._id;
 
   return Card.findByIdAndRemove(cardId)
+    .populate('owner')
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
@@ -35,7 +37,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner._id !== currentUserId) {
         throw new ForbiddenError(FORBITTEN_MESSAGE);
       }
-      return res.send({ data: card });
+      return res.send({ card });
     })
     .catch(next);
 };
@@ -44,7 +46,8 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(STATUS_CREATED).send({ data: card }))
+    .populate('owner')
+    .then((card) => res.status(STATUS_CREATED).send({ card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
@@ -66,11 +69,12 @@ const updateCard = (updateFunction) => (req, res, next) => {
     updateFunction(userId),
     { new: true },
   )
+    .populate('owner')
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND_MESSAGE);
       }
-      return res.send({ data: card });
+      return res.send({ card });
     })
     .catch(next);
 };
