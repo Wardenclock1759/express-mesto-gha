@@ -4,7 +4,7 @@ const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 
 const routes = require('./routes/index');
-const NotFoundError = require('./constants');
+const NotFoundError = require('./errors/not-found-error');
 const { NOT_FOUND_MESSAGE } = require('./constants');
 
 const app = express();
