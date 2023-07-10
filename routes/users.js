@@ -20,7 +20,9 @@ router.patch('/me', celebrate({
 }), updateUserInfo);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().uri().optional(),
+    avatar: Joi.string().uri({
+      scheme: ['http', 'https'],
+    }).optional(),
   }),
 }), updateUserAvatar);
 
