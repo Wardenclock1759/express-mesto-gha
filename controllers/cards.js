@@ -27,10 +27,6 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const currentUserId = req.user._id;
 
-  if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
-  }
-
   return Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
