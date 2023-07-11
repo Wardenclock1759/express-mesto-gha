@@ -17,7 +17,7 @@ const {
 const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -31,10 +31,7 @@ module.exports.login = (req, res) => {
       });
       res.send({ message: AUTHENTICATED });
     })
-    .catch(() => {
-      const error = new NotAuthenticated('Неправильный email или пароль');
-      res.status(error.statusCode).send({ message: error.message });
-    });
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
