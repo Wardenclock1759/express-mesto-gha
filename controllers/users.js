@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
-const NotAuthenticated = require('../errors/not-authenticated');
 
 const {
   STATUS_CREATED,
