@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
@@ -7,13 +6,9 @@ const NotFoundError = require('../errors/not-found-error');
 
 const {
   STATUS_CREATED,
-  BAD_REQUEST_CODE,
-  INTERNAL_CODE,
-  INTERNAL_MESSAGE,
   AUTHENTICATED,
 } = require('../constants');
 
-const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании пользователя.';
 const NOT_FOUND_MESSAGE = 'Пользователь по указанному _id не найден.';
 
 module.exports.login = (req, res, next) => {
@@ -45,18 +40,14 @@ module.exports.getCurrentUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ users }))
-    .catch(() => res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE }));
+    .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-  }
 
   return User.findById(userId)
     .then((user) => {
