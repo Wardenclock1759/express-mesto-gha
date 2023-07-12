@@ -1,16 +1,13 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-error');
 const ForbiddenError = require('../errors/forbidden');
 
 const {
   STATUS_CREATED,
-  BAD_REQUEST_CODE,
   FORBITTEN_MESSAGE,
 } = require('../constants');
 
 const NOT_FOUND_MESSAGE = 'Карточка с указанным _id не найдена.';
-const LIKE_ERROR_MESSAGE = 'Переданы некорректные данные для постановки/снятии лайка.';
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -48,10 +45,6 @@ module.exports.createCard = (req, res, next) => {
 const updateCard = (updateFunction) => (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
-
-  if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    return res.status(BAD_REQUEST_CODE).send({ message: LIKE_ERROR_MESSAGE });
-  }
 
   return Card.findByIdAndUpdate(
     cardId,
