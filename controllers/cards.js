@@ -6,22 +6,17 @@ const ForbiddenError = require('../errors/forbidden');
 const {
   STATUS_CREATED,
   BAD_REQUEST_CODE,
-  INTERNAL_CODE,
   FORBITTEN_MESSAGE,
-  INTERNAL_MESSAGE,
 } = require('../constants');
 
-const BAD_REQUEST_MESSAGE = 'Переданы некорректные данные при создании карточки.';
 const NOT_FOUND_MESSAGE = 'Карточка с указанным _id не найдена.';
 const LIKE_ERROR_MESSAGE = 'Переданы некорректные данные для постановки/снятии лайка.';
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate('owner')
     .then((cards) => res.send({ cards }))
-    .catch(() => {
-      res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
-    });
+    .catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -42,17 +37,12 @@ module.exports.deleteCard = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(STATUS_CREATED).send({ card }))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST_CODE).send({ message: BAD_REQUEST_MESSAGE });
-      }
-      return res.status(INTERNAL_CODE).send({ message: INTERNAL_MESSAGE });
-    });
+    .catch(next);
 };
 
 const updateCard = (updateFunction) => (req, res, next) => {
